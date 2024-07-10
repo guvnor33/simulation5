@@ -2,10 +2,8 @@ import pygame
 import random
 from tree import Tree
 
-# Initialize Pygame
 pygame.init()
 
-# Set up the display
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
 display_surface = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
