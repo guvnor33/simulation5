@@ -41,30 +41,29 @@ creatures = []
 for _ in range(10):  # Example: Adding 10 initial creatures
     add_creature(creatures, creature_surf, SCREEN_WIDTH, SCREEN_HEIGHT)
 
-
 clock = pygame.time.Clock()
-
-# Track spacebar press
-space_pressed = False
 
 run = True
 while run:
     dt = clock.tick(60) / 1000.0  # Calculate delta time in seconds
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE and not space_pressed:
-                add_tree(trees, tree_surf, SCREEN_WIDTH, SCREEN_HEIGHT)
-                space_pressed = True
-        elif event.type == pygame.KEYUP:
-            if event.key == pygame.K_SPACE:
-                space_pressed = False
+
         for tree in trees:
             if tree.alive:
                 if event.type == tree.timer_event:
                     tree.grow()
 
+    keys = pygame.key.get_pressed()
+    just_pressed = pygame.key.get_just_pressed()
+
+    if just_pressed[pygame.K_SPACE]:
+        add_tree(trees, tree_surf, SCREEN_WIDTH, SCREEN_HEIGHT)
+
+    if just_pressed[pygame.K_x]:
+        run = False
 
     display_surface.fill("lightgreen")
 
