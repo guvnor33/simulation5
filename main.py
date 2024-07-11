@@ -9,11 +9,9 @@ SCREEN_HEIGHT = 720
 display_surface = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption('Simulation5')
 
-# Load images
 tree_surf = pygame.image.load('images/pine_tree.png').convert_alpha()
 creature_surf = pygame.image.load('images/creature.png').convert_alpha()
 
-# Function to add a new tree
 def add_tree(trees, image, screen_width, screen_height):
     new_tree = Tree(
         image=image,
@@ -29,10 +27,9 @@ trees = []
 for _ in range(30):
     add_tree(trees, tree_surf, SCREEN_WIDTH, SCREEN_HEIGHT)
 
-# Add a flag to track spacebar press
+# Track spacebar press
 space_pressed = False
 
-# Main loop
 run = True
 while run:
     for event in pygame.event.get():
@@ -58,9 +55,9 @@ while run:
             tree.draw(display_surface)
 
     # Draw creature
-    display_surface.blit(creature_surf, (400, 350))
+    creature_rect = creature_surf.get_rect(midbottom=(400, 350))
+    display_surface.blit(creature_surf, creature_rect.topleft)
 
     pygame.display.update()
 
-# Quit Pygame
 pygame.quit()
