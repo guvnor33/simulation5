@@ -44,3 +44,9 @@ class Tree2(pygame.sprite.Sprite):
             for event in event_list:
                 if event.type == self.timer_event:
                     self.grow()
+
+    def __str__(self):
+        return (f"Tree(Position: {self.rect.midbottom}, "
+                f"Scale: {self.scale_factor:.2f}, "
+                f"Growths: {self.times_grown}, "
+                f"Alive: {self.alive})")
