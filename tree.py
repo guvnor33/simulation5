@@ -3,7 +3,7 @@ import random
 
 class Tree:
     MAX_GROWTHS = 10
-    tree_counter = 0  # for the timer
+    tree_timer_counter = 0  # for the timer
 
     def __init__(self, image, initial_scale, position, growth_rate, growth_interval):
 
@@ -26,10 +26,10 @@ class Tree:
         self.rect = self.scaled_image.get_rect()
         self.rect.midbottom = self.position
         
-        self.timer_event = pygame.USEREVENT + Tree.tree_counter
+        self.timer_event = pygame.USEREVENT + Tree.tree_timer_counter
         pygame.time.set_timer(self.timer_event, self.growth_interval)
              
-        Tree.tree_counter += 1
+        Tree.tree_timer_counter += 1
 
     def grow(self):
         self.times_grown += 1

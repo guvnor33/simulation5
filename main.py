@@ -1,6 +1,7 @@
 import pygame
 import random
 from tree import Tree
+from creature import Creature
 
 pygame.init()
 
@@ -27,11 +28,28 @@ trees = []
 for _ in range(30):
     add_tree(trees, tree_surf, SCREEN_WIDTH, SCREEN_HEIGHT)
 
+def add_creature(creatures, image, screen_width, screen_height):
+    new_creature = Creature(
+        image=image,
+        position=(random.randint(0, screen_width), random.randint(0, screen_height)),
+        speed=random.uniform(3, 6)  # Adjust speed range as needed
+    )
+    creatures.append(new_creature)
+
+# Create initial creatures
+creatures = []
+for _ in range(10):  # Example: Adding 10 initial creatures
+    add_creature(creatures, creature_surf, SCREEN_WIDTH, SCREEN_HEIGHT)
+
+
+clock = pygame.time.Clock()
+
 # Track spacebar press
 space_pressed = False
 
 run = True
 while run:
+    dt = clock.tick(60) / 1000.0  # Calculate delta time in seconds
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
@@ -47,16 +65,18 @@ while run:
                 if event.type == tree.timer_event:
                     tree.grow()
 
+
     display_surface.fill("lightgreen")
+
+    # Update and draw creatures
+    for creature in creatures:
+        creature.move(dt, SCREEN_WIDTH, SCREEN_HEIGHT)
+        creature.draw(display_surface)
 
     # Draw trees
     for tree in trees:
         if tree.alive:
             tree.draw(display_surface)
-
-    # Draw creature
-    creature_rect = creature_surf.get_rect(midbottom=(400, 350))
-    display_surface.blit(creature_surf, creature_rect.topleft)
 
     pygame.display.update()
 
