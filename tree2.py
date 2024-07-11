@@ -20,7 +20,7 @@ class Tree2(pygame.sprite.Sprite):
         self.growth_interval = growth_interval
         self.alive = True
         self.times_grown = 0
-        self.timer_event = pygame.USEREVENT + 1
+        self.timer_event = pygame.USEREVENT + random.randint(1, 1000)
         pygame.time.set_timer(self.timer_event, self.growth_interval)
 
     def grow(self):
@@ -40,6 +40,7 @@ class Tree2(pygame.sprite.Sprite):
             pygame.time.set_timer(self.timer_event, self.growth_interval)
 
     def update(self, event_list):
-        for event in event_list:
-            if event.type == self.timer_event and self.alive:
-                self.grow()
+        if self.alive:
+            for event in event_list:
+                if event.type == self.timer_event:
+                    self.grow()

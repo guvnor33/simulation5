@@ -5,14 +5,14 @@ class Creature2(pygame.sprite.Sprite):
     def __init__(self, image, position, speed):
         super().__init__()
         self.image = image
-        self.rect = self.image.get_rect(midbottom=position)
         self.position = pygame.math.Vector2(position)
         self.speed = speed
+        self.rect = self.image.get_rect(midbottom=self.position)
         self.direction = pygame.math.Vector2(random.uniform(-1, 1), random.uniform(-1, 1))
         self.direction.normalize_ip()
         self.next_direction_change_time = pygame.time.get_ticks() + random.randint(3000, 5000)
 
-    def update(self, dt, screen_width, screen_height):
+    def move(self, dt, screen_width, screen_height):
         current_time = pygame.time.get_ticks()
 
         if current_time >= self.next_direction_change_time:
@@ -27,3 +27,6 @@ class Creature2(pygame.sprite.Sprite):
         self.position.y = max(0, min(self.position.y, screen_height - self.rect.height))
 
         self.rect.midbottom = self.position
+
+    def update(self, dt, screen_width, screen_height):
+        self.move(dt, screen_width, screen_height)

@@ -1,7 +1,7 @@
 import pygame
 import random
-from tree import Tree
-from creature import Creature
+from tree2 import Tree2
+from creature2 import Creature2
 
 pygame.init()
 
@@ -14,68 +14,60 @@ tree_surf = pygame.image.load('images/pine_tree.png').convert_alpha()
 creature_surf = pygame.image.load('images/creature.png').convert_alpha()
 
 def add_tree(trees, image, screen_width, screen_height):
-    new_tree = Tree(
+    new_tree = Tree2(
         image=image,
         initial_scale=0.1,
         position=(random.randint(0, screen_width), random.randint(0, screen_height)),
         growth_rate=random.uniform(0.05, 0.15),
         growth_interval=random.randint(4000, 8000)
     )
-    trees.append(new_tree)
+    trees.add(new_tree)
 
-# Create initial trees
-trees = []
+def add_creature(creatures, image, screen_width, screen_height):
+    new_creature = Creature2(
+        image=image,
+        position=(random.randint(0, screen_width), random.randint(0, screen_height)),
+        speed=random.uniform(3, 6)
+    )
+    creatures.add(new_creature)
+
+# Create sprite groups
+trees = pygame.sprite.Group()
+creatures = pygame.sprite.Group()
+
+# Add initial trees and creatures
 for _ in range(30):
     add_tree(trees, tree_surf, SCREEN_WIDTH, SCREEN_HEIGHT)
 
-def add_creature(creatures, image, screen_width, screen_height):
-    new_creature = Creature(
-        image=image,
-        position=(random.randint(0, screen_width), random.randint(0, screen_height)),
-        speed=random.uniform(3, 6)  # Adjust speed range as needed
-    )
-    creatures.append(new_creature)
-
-# Create initial creatures
-creatures = []
-for _ in range(10):  # Example: Adding 10 initial creatures
+for _ in range(10):
     add_creature(creatures, creature_surf, SCREEN_WIDTH, SCREEN_HEIGHT)
 
 clock = pygame.time.Clock()
 
 run = True
 while run:
-    dt = clock.tick(60) / 1000.0  # Calculate delta time in seconds
+    dt = clock.tick(60) / 1000.0
+    keys = pygame.key.get_pressed()
 
-    for event in pygame.event.get():
+    if keys[pygame.K_x]:
+        run = False
+
+    event_list = pygame.event.get()
+    for event in event_list:
         if event.type == pygame.QUIT:
             run = False
-
-        for tree in trees:
-            if tree.alive:
-                if event.type == tree.timer_event:
-                    tree.grow()
-
-    keys = pygame.key.get_pressed()
-    just_pressed = pygame.key.get_just_pressed()
-
-    if just_pressed[pygame.K_SPACE]:
-        add_tree(trees, tree_surf, SCREEN_WIDTH, SCREEN_HEIGHT)
-
-    if just_pressed[pygame.K_x]:
-        run = False
+        if keys[pygame.K_SPACE]:
+            add_tree(trees, tree_surf, SCREEN_WIDTH, SCREEN_HEIGHT)
 
     display_surface.fill("lightgreen")
 
     # Update and draw creatures
-    for creature in creatures:
-        creature.move(dt, SCREEN_WIDTH, SCREEN_HEIGHT)
-        creature.draw(display_surface)
+    creatures.update(dt, SCREEN_WIDTH, SCREEN_HEIGHT)
+    creatures.draw(display_surface)
 
-    # Draw trees
-    for tree in trees:
-        if tree.alive:
-            tree.draw(display_surface)
+    # Update and draw trees
+    trees.update(event_list)
+    trees.draw(display_surface)
 
     pygame.display.update()
 
