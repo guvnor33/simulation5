@@ -31,9 +31,22 @@ def add_creature(creatures, image, screen_width, screen_height):
     )
     creatures.add(new_creature)
 
+def print_trees_and_creatures(trees, dead_trees, creatures):
+    print("Alive Trees:")
+    for tree in trees:
+        print(tree)
+    print("\nDead Trees:")
+    for tree in dead_trees:
+        print(tree)
+    print("\nCreatures:")
+    for creature in creatures:
+        print(creature)
+    print("-" * 40)
+
 # Create sprite groups
 trees = pygame.sprite.Group()
 creatures = pygame.sprite.Group()
+dead_trees = []
 
 # Add initial trees and creatures
 for _ in range(30):
@@ -58,6 +71,8 @@ while run:
             run = False
         if keys[pygame.K_SPACE]:
             add_tree(trees, tree_surf, SCREEN_WIDTH, SCREEN_HEIGHT)
+        if keys[pygame.K_p]:
+            print_trees_and_creatures(trees, dead_trees, creatures)
 
     display_surface.fill("lightgreen")
 
@@ -65,8 +80,13 @@ while run:
     creatures.update(dt, SCREEN_WIDTH, SCREEN_HEIGHT)
     creatures.draw(display_surface)
 
-    # Update and draw trees
-    trees.update(event_list)
+    # Update trees and move dead ones to dead_trees list
+    for tree in trees:
+        tree.update(event_list)
+        if not tree.alive:
+            trees.remove(tree)
+            dead_trees.append(tree)
+
     trees.draw(display_surface)
 
     pygame.display.update()
