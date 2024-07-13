@@ -2,14 +2,27 @@ import pygame
 import random
 
 class Creature2(pygame.sprite.Sprite):
-    def __init__(self, image, position, speed):
+    def __init__(self, image, initial_scale, position, speed):
         super().__init__()
         self.image = image
         self.position = pygame.math.Vector2(position)
-        self.speed = speed
+        self.scale_factor = initial_scale
+        self.image = pygame.transform.scale(
+            self.image,
+            (int(self.image.get_width() * self.scale_factor),
+             int(self.image.get_height() * self.scale_factor))
+        )
         self.rect = self.image.get_rect(midbottom=self.position)
         self.direction = pygame.math.Vector2(random.uniform(-1, 1), random.uniform(-1, 1)).normalize()
         self.next_direction_change_time = pygame.time.get_ticks() + random.randint(3000, 5000)
+        # *** Genetic Traits ***
+        # hunger, size of stomach, food required for a full stomach,
+        # days without eating, range of vision, range of smell,
+        # speed, size, allowed foods (plants or other creatures, seeds),
+        # toughness (akin to 'suceptibility to being eaten')
+        self.speed = speed
+
+
 
     def move(self, dt, screen_width, screen_height):
         current_time = pygame.time.get_ticks()
