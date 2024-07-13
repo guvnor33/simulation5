@@ -3,6 +3,9 @@ import random
 from tree2 import Tree2
 from creature2 import Creature2
 
+NUM_CREATURES = 50
+NUM_TREES = 40
+
 pygame.init()
 
 SCREEN_WIDTH = 1280
@@ -26,6 +29,7 @@ def add_tree(trees, image, screen_width, screen_height):
 def add_creature(creatures, image, screen_width, screen_height):
     new_creature = Creature2(
         image=image,
+        initial_scale=0.5,
         position=(random.randint(0, screen_width), random.randint(0, screen_height)),
         speed=random.uniform(3, 6)
     )
@@ -49,10 +53,10 @@ creatures = pygame.sprite.Group()
 dead_trees = []
 
 # Add initial trees and creatures
-for _ in range(30):
+for _ in range(NUM_TREES):
     add_tree(trees, tree_surf, SCREEN_WIDTH, SCREEN_HEIGHT)
 
-for _ in range(10):
+for _ in range(NUM_CREATURES):
     add_creature(creatures, creature_surf, SCREEN_WIDTH, SCREEN_HEIGHT)
 
 clock = pygame.time.Clock()
