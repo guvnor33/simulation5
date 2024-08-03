@@ -1,9 +1,11 @@
 import pygame
 import random
+
+
 from tree2 import Tree2
 from creature2 import Creature2
 
-NUM_CREATURES = 50
+NUM_CREATURES = 10
 NUM_TREES = 40
 
 pygame.init()
@@ -21,7 +23,7 @@ def add_tree(trees, image, screen_width, screen_height):
         image=image,
         initial_scale=0.1,
         position=(random.randint(0, screen_width), random.randint(0, screen_height)),
-        growth_rate=random.uniform(0.05, 0.15),
+        growth_rate=random.uniform(0.05, 0.12),
         growth_interval=random.randint(4000, 8000)
     )
     trees.add(new_tree)
@@ -46,6 +48,14 @@ def print_trees_and_creatures(trees, dead_trees, creatures):
     for creature in creatures:
         print(creature)
     print("-" * 40)
+
+def check_proximity(creatures, trees):
+    for creature in creatures:
+        for tree in trees:
+            inflated_tree = tree.clone() # Make a copy of the tree (to detect collisions)
+            if tree.alive and creature.rect.colliderect(inflated_tree.rect.inflate(10, 10)):  # Adjust the proximity detection as needed
+                print(f"Creature at {creature.rect.topleft} is near tree at {tree.rect.topleft}")
+                tree.change_color((255, 0, 0)) # to indicate visually a proximity event
 
 # Create sprite groups
 trees = pygame.sprite.Group()
@@ -90,6 +100,8 @@ while run:
         if not tree.alive:
             trees.remove(tree)
             dead_trees.append(tree)
+
+    check_proximity(creatures, trees)
 
     trees.draw(display_surface)
 

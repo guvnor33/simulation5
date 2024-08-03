@@ -1,5 +1,6 @@
 import pygame
 import random
+import copy
 
 class Tree2(pygame.sprite.Sprite):
     MAX_GROWTHS = 10
@@ -44,6 +45,13 @@ class Tree2(pygame.sprite.Sprite):
             for event in event_list:
                 if event.type == self.timer_event:
                     self.grow()
+
+    def change_color(self, color):
+        self.image = self.original_image.copy()
+        self.image.fill(color, special_flags=pygame.BLEND_RGB_MULT)
+
+    def clone(self):
+        return copy.deepcopy(self)
 
     def __str__(self):
         return (f"Tree(Position: {self.rect.midbottom}, "
