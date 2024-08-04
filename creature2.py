@@ -2,9 +2,12 @@ import pygame
 import random
 
 class Creature2(pygame.sprite.Sprite):
+    unique_id_counter = 100  # Class variable to keep track of unique IDs
     def __init__(self, image, initial_scale, position, speed):
         super().__init__()
         self.image = image
+        self.unique_id = Creature2.unique_id_counter  # Assign unique ID from the counter
+        Creature2.unique_id_counter += 1  # Increment the counter for the next creature
         self.position = pygame.math.Vector2(position)
         self.scale_factor = initial_scale
         self.image = pygame.transform.scale(
@@ -43,10 +46,16 @@ class Creature2(pygame.sprite.Sprite):
     def eat(self):
         if (self.food_in_stomach < self.stomach_size):
             self.food_in_stomach += 1
-            print(f"creature eat")
-            print(str(self))
             self.is_hungry = self.determine_hunger(self.food_in_stomach, self.stomach_size)
             self.is_full = self.determine_full(self.food_in_stomach, self.stomach_size)
+            print(f"Creature ID:{self.unique_id} has eaten.")
+            print(str(self))
+
+    def found_tree(self, tree):
+        if self.is_hungry:
+            print(f"Creature ID:{self.unique_id} found a tree and is hungry.")
+            self.eat()
+            tree.change_color((21, 155, 21)) # to indicate visually a proximity event
 
     def move(self, dt, screen_width, screen_height):
         current_time = pygame.time.get_ticks()
@@ -67,6 +76,6 @@ class Creature2(pygame.sprite.Sprite):
         self.move(dt, screen_width, screen_height)
 
     def __str__(self):
-        return (f"Creature(Position: {self.position}, Speed: {self.speed:.2f}, "
+        return (f"Creature ID:{self.unique_id} (Position: {self.position}, Speed: {self.speed:.2f}, "
                 f"Stomach Size: {self.stomach_size}, Food in Stomach: {self.food_in_stomach}, "
                 f"Is Hungry: {self.is_hungry}, Is Full: {self.is_full})")

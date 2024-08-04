@@ -6,8 +6,8 @@ import math
 from tree2 import Tree2
 from creature2 import Creature2
 
-NUM_CREATURES = 1
-NUM_TREES = 150
+NUM_CREATURES = 10
+NUM_TREES = 60
 
 pygame.init()
 
@@ -37,6 +37,8 @@ def add_creature(creatures, image, screen_width, screen_height):
         speed=random.uniform(3, 6)
     )
     creatures.add(new_creature)
+    print("\nNew creature spawned:")
+    print(new_creature)
 
 def print_trees_and_creatures(trees, dead_trees, creatures):
     print("Alive Trees:")
@@ -45,6 +47,12 @@ def print_trees_and_creatures(trees, dead_trees, creatures):
     print("\nDead Trees:")
     for tree in dead_trees:
         print(tree)
+    print("\nCreatures:")
+    for creature in creatures:
+        print(creature)
+    print("-" * 40)
+
+def print_only_creatures(creatures):
     print("\nCreatures:")
     for creature in creatures:
         print(creature)
@@ -75,21 +83,24 @@ clock = pygame.time.Clock()
 run = True
 while run:
     dt = clock.tick(60) / 1000.0
-    keys = pygame.key.get_pressed()
+    keys = pygame.key.get_just_pressed()
 
     if keys[pygame.K_x]:
         run = False
+    if keys[pygame.K_t]:
+        add_tree(trees, tree_surf, SCREEN_WIDTH, SCREEN_HEIGHT)
+    if keys[pygame.K_c]:
+        add_creature(creatures, creature_surf, SCREEN_WIDTH, SCREEN_HEIGHT)
+    if keys[pygame.K_p]:
+        print_trees_and_creatures(trees, dead_trees, creatures)
+    if keys[pygame.K_o]:
+        print_only_creatures(creatures)
 
     event_list = pygame.event.get()
     for event in event_list:
         if event.type == pygame.QUIT:
             run = False
-        if keys[pygame.K_t]:
-            add_tree(trees, tree_surf, SCREEN_WIDTH, SCREEN_HEIGHT)
-        if keys[pygame.K_c]:
-            add_creature(creatures, creature_surf, SCREEN_WIDTH, SCREEN_HEIGHT)
-        if keys[pygame.K_p]:
-            print_trees_and_creatures(trees, dead_trees, creatures)
+
 
     display_surface.fill("lightgreen")
 
@@ -108,10 +119,8 @@ while run:
         for creature in creatures:
             if check_proximity(tree, creature, 30):
                 # print(f"Creature at {creature.rect.topleft} is near tree at {tree.rect.topleft}")
-                if creature.is_hungry:
-                    creature.eat()
-                tree.change_color((21, 155, 21)) # to indicate visually a proximity event
-        
+                creature.found_tree(tree)
+
     trees.draw(display_surface)
 
     pygame.display.update()
