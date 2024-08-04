@@ -1,12 +1,13 @@
 import pygame
 import random
+import math
 
 
 from tree2 import Tree2
 from creature2 import Creature2
 
-NUM_CREATURES = 10
-NUM_TREES = 40
+NUM_CREATURES = 1
+NUM_TREES = 150
 
 pygame.init()
 
@@ -49,13 +50,13 @@ def print_trees_and_creatures(trees, dead_trees, creatures):
         print(creature)
     print("-" * 40)
 
-def check_proximity(creatures, trees):
-    for creature in creatures:
-        for tree in trees:
-            inflated_tree = tree.clone() # Make a copy of the tree (to detect collisions)
-            if tree.alive and creature.rect.colliderect(inflated_tree.rect.inflate(10, 10)):  # Adjust the proximity detection as needed
-                print(f"Creature at {creature.rect.topleft} is near tree at {tree.rect.topleft}")
-                tree.change_color((255, 0, 0)) # to indicate visually a proximity event
+def check_proximity(sprite1, sprite2, distance):
+    """Check if sprite1 is within a certain distance of sprite2."""
+    center1 = sprite1.rect.center
+    center2 = sprite2.rect.center
+    dx = center1[0] - center2[0]
+    dy = center1[1] - center2[1]
+    return math.sqrt(dx * dx + dy * dy) <= distance
 
 # Create sprite groups
 trees = pygame.sprite.Group()
@@ -83,8 +84,10 @@ while run:
     for event in event_list:
         if event.type == pygame.QUIT:
             run = False
-        if keys[pygame.K_SPACE]:
+        if keys[pygame.K_t]:
             add_tree(trees, tree_surf, SCREEN_WIDTH, SCREEN_HEIGHT)
+        if keys[pygame.K_c]:
+            add_creature(creatures, creature_surf, SCREEN_WIDTH, SCREEN_HEIGHT)
         if keys[pygame.K_p]:
             print_trees_and_creatures(trees, dead_trees, creatures)
 
@@ -101,8 +104,14 @@ while run:
             trees.remove(tree)
             dead_trees.append(tree)
 
-    check_proximity(creatures, trees)
-
+    for tree in trees:
+        for creature in creatures:
+            if check_proximity(tree, creature, 30):
+                # print(f"Creature at {creature.rect.topleft} is near tree at {tree.rect.topleft}")
+                if creature.is_hungry:
+                    creature.eat()
+                tree.change_color((21, 155, 21)) # to indicate visually a proximity event
+        
     trees.draw(display_surface)
 
     pygame.display.update()
