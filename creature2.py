@@ -7,6 +7,11 @@ import random
 #   starvation_time_limit,
 #   food_reduction_interval
 
+# ***** Notes ******
+#
+# Presently, a creature is allow to feast when near a tree..up to a full stomach
+#
+
 class Creature2(pygame.sprite.Sprite):
     MATING_TIMEOUT = 25000 # Minimum interval between matings
     unique_id_counter = 100  # Class variable to keep track of unique IDs

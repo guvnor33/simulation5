@@ -25,6 +25,7 @@ class Tree2(pygame.sprite.Sprite):
         Tree2.unique_id_counter += 1  # Increment the counter for the next creature
         self.parent = parent # Parent is the parent tree (where the seed came from)
         self.carrier = carrier # Carrier is defined when a creature deposits a previously eaten seed back into the environement
+        self.position = pygame.math.Vector2(position)
         self.rect = self.image.get_rect(midbottom=position)
         self.growth_rate = growth_rate
         self.growth_count = 0
@@ -34,6 +35,10 @@ class Tree2(pygame.sprite.Sprite):
         self.times_grown = 0
         self.timer_event = pygame.USEREVENT + random.randint(1, 1000)
         pygame.time.set_timer(self.timer_event, self.growth_interval)
+        # Set the self_spawn time for a new tree,
+        # "self spawn" indicates that the new tree spawns from a seed that dropped from the tree itself
+        self.next_self_spawn_time = pygame.time.get_ticks() + random.randint(20000, 35000)
+
 
     def grow(self):
         self.times_grown += 1
@@ -51,11 +56,36 @@ class Tree2(pygame.sprite.Sprite):
             self.rect = self.image.get_rect(midbottom=self.rect.midbottom)
             pygame.time.set_timer(self.timer_event, self.growth_interval)
 
-    def update(self, event_list):
+    def spawn_new_tree(self,trees):
+        # This code assumes a tree spawned from a tree-dropped seed
+        current_time = pygame.time.get_ticks()
+        if current_time >= self.next_self_spawn_time:
+            # Here, the tree spawns a new tree at a random nearby position
+            #new_tree_position = (self.position.x + random.randint(-50, 50), self.position.y + random.randint(-50, 50))
+            new_tree_position = (
+                self.position.x + random.randint(-50, 50), 
+                self.position.y + random.randint(-50, 50)
+            )
+            new_tree = Tree2(
+                image=self.original_image,
+                initial_scale=0.1,
+                parent=self.unique_id,
+                carrier=0,
+                position=new_tree_position,
+                growth_rate=random.uniform(0.05, 0.12),
+                growth_interval=random.randint(4000, 8000)
+            )
+            trees.add(new_tree)
+            print(f"New tree spawned at {new_tree_position}")
+            self.next_self_spawn_time = current_time + random.randint(20000, 35000)  # Reset spawn timer
+
+
+    def update(self, event_list,trees):
         if self.alive:
             for event in event_list:
                 if event.type == self.timer_event:
                     self.grow()
+        self.spawn_new_tree(trees)
 
     def change_color(self, color):
         self.image = self.original_image.copy()

@@ -6,8 +6,8 @@ import math
 from tree2 import Tree2
 from creature2 import Creature2
 
-NUM_CREATURES = 20
-NUM_TREES = 60
+NUM_CREATURES = 1
+NUM_TREES = 100
 
 pygame.init()
 
@@ -128,7 +128,7 @@ while run:
 
     # Update trees and move dead ones to dead_trees list
     for tree in trees:
-        tree.update(event_list)
+        tree.update(event_list,trees)
         if not tree.alive:
             trees.remove(tree)
             dead_trees.append(tree)
