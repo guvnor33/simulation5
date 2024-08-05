@@ -9,7 +9,7 @@ import datetime
 from tree2 import Tree2
 from creature2 import Creature2
 
-NUM_CREATURES = 2
+NUM_CREATURES = 40
 NUM_TREES = 100
 
 # Log file path
@@ -70,31 +70,34 @@ def add_creature(creatures, image, screen_width, screen_height):
         food_reduction_interval = random.randint(7500, 12500)  # Time interval to reduce food in stomach by 1 in milliseconds
     )
     creatures.add(new_creature)
-    logger.info("\nNew creature spawned from nothing:")
-    logger.info(new_creature)
+    logger.debug("New creature spawned from nothing:")
+    logger.debug(new_creature)
 
 def print_trees_and_creatures(trees, dead_trees, creatures, dead_creatures):
     logger.debug("Alive Trees:")
     for tree in trees:
-        logger.info(tree)
+        logger.debug(tree)
     logger.debug("\nDead Trees:")
     for tree in dead_trees:
-        logger.info(tree)
-    logger.info("\nCreatures:")
+        logger.debug(tree)
+    logger.debug("\nCreatures:")
     for creature in creatures:
-        logger.info(creature)
-    logger.info("\nDead Creatures:")
+        logger.debug(creature)
+    logger.debug("\nDead Creatures:")
     for creature in dead_creatures:
-        logger.info(creature)
-    logger.info("-" * 40)
+        logger.debug(creature)
+    logger.debug("-" * 40)
 
 def print_only_creatures(creatures, dead_creatures):
     logger.info("\nCreatures:")
     for creature in creatures:
         logger.info(creature)
+        print(creature)
     for creature in dead_creatures:
         logger.info(creature)
+        # print(creature)
     logger.info("-" * 40)
+    print("-" * 40)
 
 def check_proximity(sprite1, sprite2, distance):
     """Check if sprite1 is within a certain distance of sprite2."""

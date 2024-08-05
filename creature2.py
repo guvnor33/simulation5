@@ -92,6 +92,7 @@ class Creature2(pygame.sprite.Sprite):
             elif current_time - self.last_eat_time > self.starvation_time_limit:
                 self.alive = False
                 logger.info(f"Creature ID:{self.unique_id} has starved.")
+                print(f"Creature ID:{self.unique_id} has starved.")
         else:
             self.last_eat_time = None  # Reset the timer if food_in_stomach is not 0
 
@@ -128,9 +129,11 @@ class Creature2(pygame.sprite.Sprite):
             self.last_mating_time = current_time 
             found_creature.last_mating_time = current_time 
             logger.info(f"Creature {self.unique_id} is near creature {found_creature.unique_id} and will mate.")
+            print(f"Creature {self.unique_id} is near creature {found_creature.unique_id} and will mate.")
             new_creature = self.mate(self, found_creature, creature_surf, screen_width, screen_height)
             creatures.add(new_creature) # Add creature to the array of creatures
             logger.info(f"New creature (ID:{new_creature.unique_id}) born from mating:")
+            print(f"New creature (ID:{new_creature.unique_id}) born from mating:")
             logger.info(new_creature)
             logger.info(self)
             logger.info(found_creature)
@@ -163,11 +166,16 @@ class Creature2(pygame.sprite.Sprite):
     
     @staticmethod
     def mate(parent1, parent2, image, screen_width, screen_height):
-        # Fix this to later spawn near parent
-        new_position = ( 
-            random.randint(0, screen_width),
-            random.randint(0, screen_height)
+        # Calculate position of offspring based on the average position of the parents with a random offset
+        avg_x = (parent1.position.x + parent2.position.x) / 2
+        avg_y = (parent1.position.y + parent2.position.y) / 2
+        offset_x = random.randint(-50, 50)
+        offset_y = random.randint(-50, 50)
+        new_position = (
+            max(0, min(avg_x + offset_x, screen_width)),  # Ensure the new position is within screen bounds
+            max(0, min(avg_y + offset_y, screen_height))
         )
+
         new_speed = parent1.speed
         new_stomach_size = parent2.stomach_size
         new_starvation_time_limit = parent1.starvation_time_limit
