@@ -19,10 +19,13 @@ pygame.display.set_caption('Simulation5')
 tree_surf = pygame.image.load('images/pine_tree.png').convert_alpha()
 creature_surf = pygame.image.load('images/creature.png').convert_alpha()
 
+# Add trees from nothing, these trees have no genetic inheritance from parents
 def add_tree(trees, image, screen_width, screen_height):
     new_tree = Tree2(
         image=image,
         initial_scale=0.1,
+        parent=0,
+        carrier=0,
         position=(random.randint(0, screen_width), random.randint(0, screen_height)),
         growth_rate=random.uniform(0.05, 0.12),
         growth_interval=random.randint(4000, 8000)
@@ -60,6 +63,9 @@ def print_trees_and_creatures(trees, dead_trees, creatures):
         print(tree)
     print("\nCreatures:")
     for creature in creatures:
+        print(creature)
+    print("\nDead Creatures:")
+    for creature in dead_creatures:
         print(creature)
     print("-" * 40)
 

@@ -21,6 +21,7 @@ class Creature2(pygame.sprite.Sprite):
         Creature2.unique_id_counter += 1  # Increment the counter for the next creature
         self.parent1 = parent1
         self.parent2 = parent2
+        self.trees_eaten_from = []
         self.position = pygame.math.Vector2(position)
         self.scale_factor = initial_scale
         self.image = pygame.transform.scale(
@@ -65,12 +66,13 @@ class Creature2(pygame.sprite.Sprite):
         else:
             return False
     # eat and then update is_hungry
-    def eat(self):
+    def eat(self, tree):
         if (self.food_in_stomach < self.stomach_size):
             self.food_in_stomach += 1
             self.is_hungry = self.determine_hunger(self.food_in_stomach, self.stomach_size)
             self.is_full = self.determine_full(self.food_in_stomach, self.stomach_size)
             self.last_eat_time = None  # Reset starvation timer when the creature eats
+            self.trees_eaten_from.append(tree.unique_id) # Save a list of trees creature has eaten from
             print(f"Creature ID:{self.unique_id} has eaten.")
             print(str(self))
 
@@ -100,7 +102,7 @@ class Creature2(pygame.sprite.Sprite):
     def found_tree(self, tree):
         if self.is_hungry:
             print(f"Creature ID:{self.unique_id} found a tree and is hungry.")
-            self.eat()
+            self.eat(tree)
             tree.change_color((21, 155, 21)) # to indicate visually a proximity event
 
     def found_creature(self, found_creature, creatures, creature_surf, screen_width, screen_height):
@@ -146,9 +148,10 @@ class Creature2(pygame.sprite.Sprite):
         self.reduce_food_in_stomach()
 
     def __str__(self):
-        return (f"Creature ID:{self.unique_id} Parents: {self.parent1},{self.parent2} (Position: {self.position}, Speed: {self.speed:.2f}, "
+        return (f"Creature ID:{self.unique_id}, Parents: {self.parent1:03},{self.parent2:03} (Position: {self.position}, Speed: {self.speed:.2f}, "
                 f"Stomach Size: {self.stomach_size}, Food in Stomach: {self.food_in_stomach}, "
-                f"Is Hungry: {self.is_hungry}, Is Full: {self.is_full})")
+                f"Is Hungry: {self.is_hungry}, Is Full: {self.is_full})"
+                f"Trees eaten from: {self.trees_eaten_from})")
     
     @staticmethod
     def mate(parent1, parent2, image, screen_width, screen_height):
