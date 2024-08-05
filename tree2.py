@@ -1,6 +1,9 @@
 import pygame
 import random
 import copy
+import logging
+
+logger = logging.getLogger()
 
 # These variables are genetic traits that must be passed in from the parents:
 #   
@@ -37,7 +40,7 @@ class Tree2(pygame.sprite.Sprite):
         pygame.time.set_timer(self.timer_event, self.growth_interval)
         # Set the self_spawn time for a new tree,
         # "self spawn" indicates that the new tree spawns from a seed that dropped from the tree itself
-        self.next_self_spawn_time = pygame.time.get_ticks() + random.randint(20000, 35000)
+        self.next_self_spawn_time = pygame.time.get_ticks() + random.randint(30000, 55000)
 
 
     def grow(self):
@@ -76,8 +79,8 @@ class Tree2(pygame.sprite.Sprite):
                 growth_interval=random.randint(4000, 8000)
             )
             trees.add(new_tree)
-            print(f"New tree spawned at {new_tree_position}")
-            self.next_self_spawn_time = current_time + random.randint(20000, 35000)  # Reset spawn timer
+            logger.debug(f"New tree spawned at {new_tree_position}")
+            self.next_self_spawn_time = current_time + random.randint(30000, 55000)  # Reset spawn timer
 
 
     def update(self, event_list,trees):

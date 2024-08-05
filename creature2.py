@@ -1,5 +1,8 @@
 import pygame
 import random
+import logging
+
+logger = logging.getLogger()
 
 # These variables are genetic traits that must be passed in from the parents:
 #   speed,
@@ -78,8 +81,8 @@ class Creature2(pygame.sprite.Sprite):
             self.is_full = self.determine_full(self.food_in_stomach, self.stomach_size)
             self.last_eat_time = None  # Reset starvation timer when the creature eats
             self.trees_eaten_from.append(tree.unique_id) # Save a list of trees creature has eaten from
-            print(f"Creature ID:{self.unique_id} has eaten.")
-            print(str(self))
+            logger.info(f"Creature ID:{self.unique_id} has eaten.")
+            logger.info(str(self))
 
     def check_starvation(self):
         current_time = pygame.time.get_ticks()
@@ -88,7 +91,7 @@ class Creature2(pygame.sprite.Sprite):
                 self.last_eat_time = current_time  # Start the timer when food_in_stomach reaches 0
             elif current_time - self.last_eat_time > self.starvation_time_limit:
                 self.alive = False
-                print(f"Creature ID:{self.unique_id} has starved.")
+                logger.info(f"Creature ID:{self.unique_id} has starved.")
         else:
             self.last_eat_time = None  # Reset the timer if food_in_stomach is not 0
 
@@ -99,14 +102,14 @@ class Creature2(pygame.sprite.Sprite):
                 self.food_in_stomach -= 1
                 self.is_hungry = self.determine_hunger(self.food_in_stomach, self.stomach_size)
                 self.is_full = self.determine_full(self.food_in_stomach, self.stomach_size)
-                print(f"Creature ID:{self.unique_id} lost 1 food. Current food: {self.food_in_stomach}")
+                logger.info(f"Creature ID:{self.unique_id} lost 1 food. Current food: {self.food_in_stomach}")
                 if self.food_in_stomach == 0:
                     self.last_eat_time = current_time  # Start starvation timer
             self.last_food_reduction_time = current_time  # Reset the food reduction timer
 
     def found_tree(self, tree):
         if self.is_hungry:
-            print(f"Creature ID:{self.unique_id} found a tree and is hungry.")
+            logger.info(f"Creature ID:{self.unique_id} found a tree and is hungry.")
             self.eat(tree)
             tree.change_color((21, 155, 21)) # to indicate visually a proximity event
 
@@ -124,13 +127,13 @@ class Creature2(pygame.sprite.Sprite):
         if ((self.last_mating_time is None) and (found_creature.last_mating_time is None)):
             self.last_mating_time = current_time 
             found_creature.last_mating_time = current_time 
-            print(f"Creature {self.unique_id} is near creature {found_creature.unique_id} and will mate.")
+            logger.info(f"Creature {self.unique_id} is near creature {found_creature.unique_id} and will mate.")
             new_creature = self.mate(self, found_creature, creature_surf, screen_width, screen_height)
             creatures.add(new_creature) # Add creature to the array of creatures
-            print(f"New creature (ID:{new_creature.unique_id}) born from mating:")
-            print(new_creature)
-            print(self)
-            print(found_creature)
+            logger.info(f"New creature (ID:{new_creature.unique_id}) born from mating:")
+            logger.info(new_creature)
+            logger.info(self)
+            logger.info(found_creature)
 
 
     def move(self, dt, screen_width, screen_height):
