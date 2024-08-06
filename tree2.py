@@ -91,8 +91,10 @@ class Tree2(pygame.sprite.Sprite):
         self.spawn_new_tree(trees)
 
     def change_color(self, color):
-        self.image = self.original_image.copy()
-        self.image.fill(color, special_flags=pygame.BLEND_RGB_MULT)
+        current_size = self.image.get_size()  # Get the current size of the tree image
+        self.image = self.original_image.copy()  # Make a copy of the original image
+        self.image.fill(color, special_flags=pygame.BLEND_RGB_MULT)  # Apply the color
+        self.image = pygame.transform.scale(self.image, current_size)  # Resize to the current size
 
     def clone(self):
         return copy.deepcopy(self)

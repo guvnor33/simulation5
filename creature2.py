@@ -15,16 +15,18 @@ logger = logging.getLogger()
 # Presently, a creature is allow to feast when near a tree..up to a full stomach
 #
 
+
 class Creature2(pygame.sprite.Sprite):
     MATING_TIMEOUT = 25000 # Minimum interval between matings
     unique_id_counter = 100  # Class variable to keep track of unique IDs
 
-    def __init__(self, image, initial_scale, parent1, parent2, position, speed, stomach_size, starvation_time_limit, food_reduction_interval):
+    def __init__(self, image, initial_scale, parent1, parent2, position, speed, generation, stomach_size, starvation_time_limit, food_reduction_interval):
         super().__init__()
         self.alive = True
         self.just_ate = False # used during update to decide whether to spread a tree
         self.born_time = pygame.time.get_ticks()
         self.last_mating_time = None
+        self.original_image = image
         self.image = image
         self.unique_id = Creature2.unique_id_counter  # Assign unique ID from the counter
         Creature2.unique_id_counter += 1  # Increment the counter for the next creature
@@ -41,6 +43,7 @@ class Creature2(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(midbottom=self.position)
         self.direction = pygame.math.Vector2(random.uniform(-1, 1), random.uniform(-1, 1)).normalize()
         self.next_direction_change_time = pygame.time.get_ticks() + random.randint(3000, 5000)
+        self.generation = generation
 
         # *** Genetic Traits ***
         # is hungrt, stomach size, is full,
@@ -74,6 +77,14 @@ class Creature2(pygame.sprite.Sprite):
             return True
         else:
             return False
+
+    # not used currently    
+    def change_image(self, new_image):
+        current_size = self.image.get_size()  # Get the current size of the creature image
+        self.image = new_image.copy()  # Make a copy of the new image
+        self.image = pygame.transform.scale(self.image, current_size)  # Resize to the current size
+        self.rect = self.image.get_rect(midbottom=self.position)  # Update the rect to match the new image
+
     # eat and then update is_hungry
     def eat(self, tree):
         if (self.food_in_stomach < self.stomach_size):
@@ -116,7 +127,8 @@ class Creature2(pygame.sprite.Sprite):
             self.eat(tree)
             tree.change_color((21, 155, 21)) # to indicate visually a proximity event
 
-    def found_creature(self, found_creature, creatures, creature_surf, screen_width, screen_height):
+    #def found_creature(self, found_creature, creatures, creature_surf, screen_width, screen_height):
+    def found_creature(self, found_creature, creatures, creature_images, screen_width, screen_height):
         current_time = pygame.time.get_ticks()
 
         # Reset mating times of creatures if it has been long enough
@@ -132,7 +144,7 @@ class Creature2(pygame.sprite.Sprite):
             found_creature.last_mating_time = current_time 
             logger.info(f"Creature {self.unique_id} is near creature {found_creature.unique_id} and will mate.")
             print(f"Creature {self.unique_id} is near creature {found_creature.unique_id} and will mate.")
-            new_creature = self.mate(self, found_creature, creature_surf, screen_width, screen_height)
+            new_creature = self.mate(self, found_creature, creature_images, screen_width, screen_height)
             creatures.add(new_creature) # Add creature to the array of creatures
             logger.info(f"New creature (ID:{new_creature.unique_id}) born from mating:")
             print(f"New creature (ID:{new_creature.unique_id}) born from mating:")
@@ -169,7 +181,7 @@ class Creature2(pygame.sprite.Sprite):
                 f"Trees eaten from: {self.trees_eaten_from})")
     
     @staticmethod
-    def mate(parent1, parent2, image, screen_width, screen_height):
+    def mate(parent1, parent2, creature_images, screen_width, screen_height):
         # Calculate position of offspring based on the average position of the parents with a random offset
         avg_x = (parent1.position.x + parent2.position.x) / 2
         avg_y = (parent1.position.y + parent2.position.y) / 2
@@ -184,18 +196,23 @@ class Creature2(pygame.sprite.Sprite):
         new_stomach_size = parent2.stomach_size
         new_starvation_time_limit = parent1.starvation_time_limit
         new_food_reduction_interval = parent2.food_reduction_interval
+        # Set the generation of the offspring
+        new_generation = max(parent1.generation, parent2.generation) + 1
+        new_generation = min(new_generation, 8)  # Cap the generation to 8 as there are only 9 images (g0 to g8)
+        new_image = creature_images[new_generation]
         # These variables are genetic traits that must be passed in from the parents:
         #   speed,
         #   stomach_size,
         #   starvation_time_limit,
         #   food_reduction_interval
         new_creature = Creature2(
-            image=image,
+            image=new_image,
             initial_scale=0.5,
             parent1=parent1.unique_id,
             parent2=parent2.unique_id,
             position=new_position,
             speed=new_speed,
+            generation=new_generation,
             stomach_size=new_stomach_size,
             starvation_time_limit=new_starvation_time_limit,
             food_reduction_interval=new_food_reduction_interval
