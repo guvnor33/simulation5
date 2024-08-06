@@ -22,6 +22,7 @@ class Creature2(pygame.sprite.Sprite):
     def __init__(self, image, initial_scale, parent1, parent2, position, speed, stomach_size, starvation_time_limit, food_reduction_interval):
         super().__init__()
         self.alive = True
+        self.just_ate = False # used during update to decide whether to spread a tree
         self.born_time = pygame.time.get_ticks()
         self.last_mating_time = None
         self.image = image
@@ -101,9 +102,10 @@ class Creature2(pygame.sprite.Sprite):
         if current_time - self.last_food_reduction_time >= self.food_reduction_interval:
             if self.food_in_stomach > 0:
                 self.food_in_stomach -= 1
+                self.just_ate = True
                 self.is_hungry = self.determine_hunger(self.food_in_stomach, self.stomach_size)
                 self.is_full = self.determine_full(self.food_in_stomach, self.stomach_size)
-                logger.info(f"Creature ID:{self.unique_id} lost 1 food. Current food: {self.food_in_stomach}")
+                logger.info(f"Creature ID:{self.unique_id} digested 1 food. Current food: {self.food_in_stomach}")
                 if self.food_in_stomach == 0:
                     self.last_eat_time = current_time  # Start starvation timer
             self.last_food_reduction_time = current_time  # Reset the food reduction timer
@@ -156,7 +158,9 @@ class Creature2(pygame.sprite.Sprite):
     def update(self, dt, screen_width, screen_height):
         self.move(dt, screen_width, screen_height)
         self.check_starvation()
-        self.reduce_food_in_stomach()
+        if (self.reduce_food_in_stomach()):
+            # chance for creature to spread tree
+            pass
 
     def __str__(self):
         return (f"Creature ID:{self.unique_id}, Parents: {self.parent1:03},{self.parent2:03} (Position: {self.position}, Speed: {self.speed:.2f}, "

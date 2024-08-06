@@ -9,7 +9,7 @@ import datetime
 from tree2 import Tree2
 from creature2 import Creature2
 
-NUM_CREATURES = 40
+NUM_CREATURES = 50
 NUM_TREES = 100
 
 # Log file path
@@ -27,6 +27,7 @@ logger = logging.getLogger()
 start_time = time.time()
 start_time_str = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(start_time))
 logger.info(f"Simulation started at {start_time_str}")
+print(f"Simulation started at {start_time_str}")
 
 pygame.init()
 
@@ -39,7 +40,7 @@ tree_surf = pygame.image.load('images/pine_tree.png').convert_alpha()
 creature_surf = pygame.image.load('images/creature.png').convert_alpha()
 
 # Add trees from nothing, these trees have no genetic inheritance from parents
-def add_tree(trees, image, screen_width, screen_height):
+def add_initial_tree(trees, image, screen_width, screen_height):
     new_tree = Tree2(
         image=image,
         initial_scale=0.1,
@@ -51,8 +52,25 @@ def add_tree(trees, image, screen_width, screen_height):
     )
     trees.add(new_tree)
 
+# Add tree spread by creature
+def add_tree_from_creature(trees, creature, image, screen_width, screen_height):
+    if creature.trees_eaten_from:
+        parent = creature.trees_eaten_from[0]
+    else:
+        parent = 000  # this would indicate that the creature has just digested "initial" food
+    new_tree = Tree2(
+        image=image,
+        initial_scale=0.1,
+        parent=parent,
+        carrier=creature.unique_id,
+        position=(random.randint(0, screen_width), random.randint(0, screen_height)),
+        growth_rate=random.uniform(0.05, 0.12),
+        growth_interval=random.randint(4000, 8000)
+    )
+    trees.add(new_tree)
+
 # Add creatures from nothing, these creatures have no genetic inheritance from parents
-def add_creature(creatures, image, screen_width, screen_height):
+def add_initial_creature(creatures, image, screen_width, screen_height):
     # These variables are genetic traits that must be created here new:
     #   speed,
     #   stomach_size,
@@ -74,15 +92,15 @@ def add_creature(creatures, image, screen_width, screen_height):
     logger.debug(new_creature)
 
 def print_trees_and_creatures(trees, dead_trees, creatures, dead_creatures):
-    logger.debug("Alive Trees:")
+    logger.info("Alive Trees:")
     for tree in trees:
-        logger.debug(tree)
+        logger.info(tree)
     logger.debug("\nDead Trees:")
     for tree in dead_trees:
         logger.debug(tree)
     logger.debug("\nCreatures:")
     for creature in creatures:
-        logger.debug(creature)
+        logger.info(creature)
     logger.debug("\nDead Creatures:")
     for creature in dead_creatures:
         logger.debug(creature)
@@ -115,10 +133,10 @@ dead_creatures = []
 
 # Add initial trees and creatures
 for _ in range(NUM_TREES):
-    add_tree(trees, tree_surf, SCREEN_WIDTH, SCREEN_HEIGHT)
+    add_initial_tree(trees, tree_surf, SCREEN_WIDTH, SCREEN_HEIGHT)
 
 for _ in range(NUM_CREATURES):
-    add_creature(creatures, creature_surf, SCREEN_WIDTH, SCREEN_HEIGHT)
+    add_initial_creature(creatures, creature_surf, SCREEN_WIDTH, SCREEN_HEIGHT)
 
 clock = pygame.time.Clock()
 
@@ -133,9 +151,9 @@ while run:
     if keys[pygame.K_x]:
         run = False
     if keys[pygame.K_t]:
-        add_tree(trees, tree_surf, SCREEN_WIDTH, SCREEN_HEIGHT)
+        add_initial_tree(trees, tree_surf, SCREEN_WIDTH, SCREEN_HEIGHT)
     if keys[pygame.K_c]:
-        add_creature(creatures, creature_surf, SCREEN_WIDTH, SCREEN_HEIGHT)
+        add_initial_creature(creatures, creature_surf, SCREEN_WIDTH, SCREEN_HEIGHT)
     if keys[pygame.K_p]:
         print_trees_and_creatures(trees, dead_trees, creatures, dead_creatures)
     if keys[pygame.K_o]:
@@ -146,11 +164,19 @@ while run:
         if event.type == pygame.QUIT:
             run = False
 
-
     display_surface.fill("lightgreen")
 
     # Update and draw creatures
-    creatures.update(dt, SCREEN_WIDTH, SCREEN_HEIGHT)
+    for creature in creatures:
+        creature.update(dt, SCREEN_WIDTH, SCREEN_HEIGHT)
+        if creature.just_ate is True:
+            # 25% chance to spawn a new tree
+            if random.random() < 0.25:
+                add_tree_from_creature(trees, creature, tree_surf, SCREEN_WIDTH, SCREEN_HEIGHT)
+                logger.info(f"Creature ID:{creature.unique_id} spawned a new tree.")
+                print(f"Creature ID:{creature.unique_id} spawned a new tree.")
+        creature.just_ate = False
+
     creatures.draw(display_surface)
 
     # Update trees and move dead ones to dead_trees list
@@ -190,13 +216,16 @@ while run:
     if run is False:
         # Log the final trees and creatures
         print_trees_and_creatures(trees, dead_trees, creatures, dead_creatures)
-        # Log the end time of the run
+        # Log the end times of the run
+        logger.info(f"Simulation started at {start_time_str}")
+        print(f"Simulation started at {start_time_str}")
         end_time = time.time()
         end_time_str = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(end_time))
         logger.info(f"Simulation ended at {end_time_str}")
-        # Calculate and log the duration
+        print(f"Simulation ended at {end_time_str}")
         duration = end_time - start_time
         duration_str = str(datetime.timedelta(seconds=duration))
         logger.info(f"Simulation ran for {duration_str}")
+        print(f"Simulation ran for {duration_str}")
 
 pygame.quit()
