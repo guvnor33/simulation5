@@ -9,7 +9,7 @@ import datetime
 from tree2 import Tree2
 from creature2 import Creature2
 
-NUM_CREATURES = 50
+NUM_CREATURES = 70
 NUM_TREES = 100
 
 # Log file path
@@ -182,7 +182,7 @@ while run:
             if random.random() < 0.25:
                 add_tree_from_creature(trees, creature, tree_surf, SCREEN_WIDTH, SCREEN_HEIGHT)
                 logger.info(f"Creature ID:{creature.unique_id} spawned a new tree.")
-                print(f"Creature ID:{creature.unique_id} spawned a new tree.")
+                # print(f"Creature ID:{creature.unique_id} spawned a new tree.")
         creature.just_ate = False
 
     creatures.draw(display_surface)

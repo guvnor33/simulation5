@@ -17,7 +17,7 @@ logger = logging.getLogger()
 
 
 class Creature2(pygame.sprite.Sprite):
-    MATING_TIMEOUT = 25000 # Minimum interval between matings
+    MATING_TIMEOUT = 30000 # Minimum interval between matings
     unique_id_counter = 100  # Class variable to keep track of unique IDs
 
     def __init__(self, image, initial_scale, parent1, parent2, position, speed, generation, stomach_size, starvation_time_limit, food_reduction_interval):
@@ -103,8 +103,8 @@ class Creature2(pygame.sprite.Sprite):
                 self.last_eat_time = current_time  # Start the timer when food_in_stomach reaches 0
             elif current_time - self.last_eat_time > self.starvation_time_limit:
                 self.alive = False
-                logger.info(f"Creature ID:{self.unique_id} has starved.")
-                print(f"Creature ID:{self.unique_id} has starved.")
+                logger.info(f"Creature ID:{self.unique_id}-{self.generation} has starved.")
+                print(f"Creature ID:{self.unique_id}-{self.generation} has starved.")
         else:
             self.last_eat_time = None  # Reset the timer if food_in_stomach is not 0
 
@@ -127,31 +127,35 @@ class Creature2(pygame.sprite.Sprite):
             self.eat(tree)
             tree.change_color((21, 155, 21)) # to indicate visually a proximity event
 
-    #def found_creature(self, found_creature, creatures, creature_surf, screen_width, screen_height):
     def found_creature(self, found_creature, creatures, creature_images, screen_width, screen_height):
         current_time = pygame.time.get_ticks()
+        can_mate = True
+
+        # Prevent newborns from mating
+        if (current_time - self.born_time) < self.MATING_TIMEOUT:
+            can_mate = False
+        if (current_time - found_creature.born_time) < found_creature.MATING_TIMEOUT:
+            can_mate = False
 
         # Reset mating times of creatures if it has been long enough
         if self.last_mating_time is not None:
-            if (self.last_mating_time - current_time) > self.MATING_TIMEOUT:
-                self.last_mating_time = None
+            if (current_time - self.last_mating_time) < self.MATING_TIMEOUT:
+                can_mate = False
         if found_creature.last_mating_time is not None:
-            if (found_creature.last_mating_time - current_time) > found_creature.MATING_TIMEOUT:
-                found_creature.last_mating_time = None
+            if (current_time - found_creature.last_mating_time) < found_creature.MATING_TIMEOUT:
+                can_mate = False
 
-        if ((self.last_mating_time is None) and (found_creature.last_mating_time is None)):
-            self.last_mating_time = current_time 
-            found_creature.last_mating_time = current_time 
+        if can_mate == True:
             logger.info(f"Creature {self.unique_id} is near creature {found_creature.unique_id} and will mate.")
-            print(f"Creature {self.unique_id} is near creature {found_creature.unique_id} and will mate.")
             new_creature = self.mate(self, found_creature, creature_images, screen_width, screen_height)
             creatures.add(new_creature) # Add creature to the array of creatures
-            logger.info(f"New creature (ID:{new_creature.unique_id}) born from mating:")
-            print(f"New creature (ID:{new_creature.unique_id}) born from mating:")
+            logger.info(f"New creature (ID:{new_creature.unique_id}-{new_creature.generation}) born from mating:")
+            print(f"New creature (ID:{new_creature.unique_id}-{new_creature.generation}) born from mating:")
             logger.info(new_creature)
             logger.info(self)
             logger.info(found_creature)
-
+            self.last_mating_time = current_time 
+            found_creature.last_mating_time = current_time
 
     def move(self, dt, screen_width, screen_height):
         current_time = pygame.time.get_ticks()
@@ -175,7 +179,7 @@ class Creature2(pygame.sprite.Sprite):
             pass
 
     def __str__(self):
-        return (f"Creature ID:{self.unique_id}, Parents: {self.parent1:03},{self.parent2:03} (Position: {self.position}, Speed: {self.speed:.2f}, "
+        return (f"Creature ID:{self.unique_id}-{self.generation} Parents: {self.parent1:03},{self.parent2:03} (Position: {self.position}, Speed: {self.speed:.2f}, "
                 f"Stomach Size: {self.stomach_size}, Food in Stomach: {self.food_in_stomach}, "
                 f"Is Hungry: {self.is_hungry}, Is Full: {self.is_full})"
                 f"Trees eaten from: {self.trees_eaten_from})")
