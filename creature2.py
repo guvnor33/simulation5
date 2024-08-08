@@ -46,7 +46,7 @@ class Creature2(pygame.sprite.Sprite):
         self.generation = generation
 
         # *** Genetic Traits ***
-        # is hungrt, stomach size, is full,
+        # is hungry, stomach size, is full,
         # days without eating, range of vision, range of smell,
         # speed, size, allowed foods (plants or other creatures, seeds),
         # toughness (akin to 'suceptibility to being eaten')

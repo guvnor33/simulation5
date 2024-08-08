@@ -10,7 +10,7 @@ from tree2 import Tree2
 from creature2 import Creature2
 
 NUM_CREATURES = 70
-NUM_TREES = 100
+NUM_TREES = 50
 
 # Log file path
 log_file = 'simulation5.log'
@@ -36,18 +36,19 @@ SCREEN_HEIGHT = 720
 display_surface = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption('Simulation5')
 
-tree_surf = pygame.image.load('images/pine_tree.png').convert_alpha()
-#creature_surf = pygame.image.load('images/creature.png').convert_alpha()
-#creature_g2_image = pygame.image.load('images/creature_g2.png').convert_alpha()
+#tree_surf = pygame.image.load('images/fruit_tree-8.png').convert_alpha()
+
 creature_images = [
     pygame.image.load(f'images/creature_g{i}.png').convert_alpha() for i in range(9)
 ]
-
+tree_images = [
+    pygame.image.load(f'images/fruit_tree-{i}.png').convert_alpha() for i in range(1, 9)
+]
 
 # Add trees from nothing, these trees have no genetic inheritance from parents
 def add_initial_tree(trees, image, screen_width, screen_height):
     new_tree = Tree2(
-        image=image,
+        image=image[0],
         initial_scale=0.1,
         parent=0,
         carrier=0,
@@ -64,7 +65,7 @@ def add_tree_from_creature(trees, creature, image, screen_width, screen_height):
     else:
         parent = 000  # this would indicate that the creature has just digested "initial" food
     new_tree = Tree2(
-        image=image,
+        image=image[0],
         initial_scale=0.1,
         parent=parent,
         carrier=creature.unique_id,
@@ -142,7 +143,7 @@ dead_creatures = []
 
 # Add initial trees and creatures
 for _ in range(NUM_TREES):
-    add_initial_tree(trees, tree_surf, SCREEN_WIDTH, SCREEN_HEIGHT)
+    add_initial_tree(trees, tree_images, SCREEN_WIDTH, SCREEN_HEIGHT)
 for _ in range(NUM_CREATURES):
     add_initial_creature(creatures, creature_images, SCREEN_WIDTH, SCREEN_HEIGHT)
 
@@ -159,7 +160,7 @@ while run:
     if keys[pygame.K_x]:
         run = False
     if keys[pygame.K_t]:
-        add_initial_tree(trees, tree_surf, SCREEN_WIDTH, SCREEN_HEIGHT)
+        add_initial_tree(trees, tree_images, SCREEN_WIDTH, SCREEN_HEIGHT)
     if keys[pygame.K_c]:
         add_initial_creature(creatures, creature_images, SCREEN_WIDTH, SCREEN_HEIGHT)
     if keys[pygame.K_p]:
@@ -180,7 +181,7 @@ while run:
         if creature.just_ate is True:
             # 25% chance to spawn a new tree
             if random.random() < 0.25:
-                add_tree_from_creature(trees, creature, tree_surf, SCREEN_WIDTH, SCREEN_HEIGHT)
+                add_tree_from_creature(trees, creature, tree_images, SCREEN_WIDTH, SCREEN_HEIGHT)
                 logger.info(f"Creature ID:{creature.unique_id} spawned a new tree.")
                 # print(f"Creature ID:{creature.unique_id} spawned a new tree.")
         creature.just_ate = False

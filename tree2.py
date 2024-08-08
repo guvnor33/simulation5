@@ -82,7 +82,6 @@ class Tree2(pygame.sprite.Sprite):
             logger.debug(f"New tree spawned at {new_tree_position}")
             self.next_self_spawn_time = current_time + random.randint(30000, 55000)  # Reset spawn timer
 
-
     def update(self, event_list,trees):
         if self.alive:
             for event in event_list:
