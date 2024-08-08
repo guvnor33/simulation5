@@ -12,7 +12,7 @@ logger = logging.getLogger()
 
 # ***** Notes ******
 #
-# Presently, a creature is allow to feast when near a tree..up to a full stomach
+# Presently, a creature is allowed to feast when near a tree..up to a full stomach
 #
 
 
@@ -162,6 +162,15 @@ class Creature2(pygame.sprite.Sprite):
         if current_time >= self.next_direction_change_time:
             self.direction = pygame.math.Vector2(random.uniform(-1, 1), random.uniform(-1, 1)).normalize()
             self.next_direction_change_time = current_time + random.randint(3000, 4000)
+            # Rotate the image to point the nose (left midcenter) in the direction of movement
+            angle = self.direction.angle_to(pygame.math.Vector2(1, 0))  # Calculate the angle between direction and x-axis
+            self.image = pygame.transform.rotate(self.original_image, -angle)  # Rotate the original image
+            self.rect = self.image.get_rect(center=self.rect.center)  # Update the rect to match the new image
+            self.image = pygame.transform.scale(
+                self.image,
+                (int(self.image.get_width() * self.scale_factor),
+                int(self.image.get_height() * self.scale_factor))
+            )
 
         movement = self.direction * self.speed * dt
         self.position += movement
@@ -171,12 +180,13 @@ class Creature2(pygame.sprite.Sprite):
 
         self.rect.midbottom = self.position
 
+
+
     def update(self, dt, screen_width, screen_height):
         self.move(dt, screen_width, screen_height)
         self.check_starvation()
-        if (self.reduce_food_in_stomach()):
-            # chance for creature to spread tree
-            pass
+        self.reduce_food_in_stomach()
+
 
     def __str__(self):
         return (f"Creature ID:{self.unique_id}-{self.generation} Parents: {self.parent1:03},{self.parent2:03} (Position: {self.position}, Speed: {self.speed:.2f}, "
@@ -197,6 +207,7 @@ class Creature2(pygame.sprite.Sprite):
         )
 
         new_speed = parent1.speed
+        print(Creature2.mutation_multiplier())
         new_stomach_size = parent2.stomach_size
         new_starvation_time_limit = parent1.starvation_time_limit
         new_food_reduction_interval = parent2.food_reduction_interval
@@ -222,3 +233,16 @@ class Creature2(pygame.sprite.Sprite):
             food_reduction_interval=new_food_reduction_interval
         )
         return new_creature
+    
+    @classmethod
+    def mutation_multiplier(cls):
+        # Generate a multiplier using a normal distribution
+        multiplier = random.gauss(0, 0.05)
+        
+        # Clamp the multiplier to the range [-0.2, 0.2]
+        if multiplier < -0.2:
+            multiplier = -0.2
+        elif multiplier > 0.2:
+            multiplier = 0.2
+        
+        return multiplier
