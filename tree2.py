@@ -3,6 +3,8 @@ import random
 import copy
 import logging
 
+MAX_TREES = 300
+
 logger = logging.getLogger()
 
 # These variables are genetic traits that must be passed in from the parents:
@@ -123,7 +125,8 @@ class Tree2(pygame.sprite.Sprite):
             for event in event_list:
                 if event.type == self.timer_event:
                     self.grow()
-        self.spawn_new_tree(trees)
+        if len(trees) < MAX_TREES:
+            self.spawn_new_tree(trees)  
 
     def change_color(self, color):
         current_size = self.image.get_size()  # Get the current size of the tree image

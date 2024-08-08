@@ -11,6 +11,7 @@ from creature2 import Creature2
 
 NUM_CREATURES = 80
 NUM_TREES = 40
+MAX_TREES = 300
 
 # Log file path
 log_file = 'simulation5.log'
@@ -179,11 +180,12 @@ while run:
     for creature in creatures:
         creature.update(dt, SCREEN_WIDTH, SCREEN_HEIGHT)
         if creature.just_ate is True:
-            # 25% chance to spawn a new tree
-            if random.random() < 0.25:
-                add_tree_from_creature(trees, creature, tree_images, SCREEN_WIDTH, SCREEN_HEIGHT)
-                logger.info(f"Creature ID:{creature.unique_id} spawned a new tree.")
-                # print(f"Creature ID:{creature.unique_id} spawned a new tree.")
+            if len(trees) < MAX_TREES:
+                # 25% chance to spawn a new tree
+                if random.random() < 0.25:
+                    add_tree_from_creature(trees, creature, tree_images, SCREEN_WIDTH, SCREEN_HEIGHT)
+                    logger.info(f"Creature ID:{creature.unique_id} spawned a new tree.")
+                    # print(f"Creature ID:{creature.unique_id} spawned a new tree.")
         creature.just_ate = False
 
     creatures.draw(display_surface)
@@ -232,6 +234,8 @@ while run:
         end_time_str = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(end_time))
         logger.info(f"Simulation ended at {end_time_str}")
         print(f"Simulation ended at {end_time_str}")
+        print(f"Alive Creatures: {len(creatures)}, Alive Trees: {len(trees)}")
+        logger.info(f"Alive Creatures: {len(creatures)}, Alive Trees: {len(trees)}")
         duration = end_time - start_time
         duration_str = str(datetime.timedelta(seconds=duration))
         logger.info(f"Simulation ran for {duration_str}")

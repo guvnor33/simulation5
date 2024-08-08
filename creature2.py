@@ -205,12 +205,18 @@ class Creature2(pygame.sprite.Sprite):
             max(0, min(avg_x + offset_x, screen_width)),  # Ensure the new position is within screen bounds
             max(0, min(avg_y + offset_y, screen_height))
         )
-
-        new_speed = parent1.speed
-        print(Creature2.mutation_multiplier())
-        new_stomach_size = parent2.stomach_size
-        new_starvation_time_limit = parent1.starvation_time_limit
-        new_food_reduction_interval = parent2.food_reduction_interval
+        new_speed = parent1.speed * Creature2.mutation_multiplier()
+        print(f"Parent1 (G{parent1.generation}) speed is: {parent1.speed}")
+        print(f"Newborn speed is: {new_speed}")
+        new_stomach_size = round(parent2.stomach_size * Creature2.mutation_multiplier())
+        print(f"Parent2 (G{parent2.generation}) stomach size is: {parent2.stomach_size}")
+        print(f"Newborn stomach size is: {new_stomach_size}")
+        new_starvation_time_limit = round(parent1.starvation_time_limit * Creature2.mutation_multiplier())
+        print(f"Parent1 (G{parent1.generation}) starvation_time_limit is: {parent1.starvation_time_limit}")
+        print(f"Newborn starvation_time_limit is: {new_starvation_time_limit}")
+        new_food_reduction_interval = round(parent2.food_reduction_interval * Creature2.mutation_multiplier())
+        print(f"Parent2 (G{parent2.generation}) food_reduction_interval is: {parent2.food_reduction_interval}")
+        print(f"Newborn food_reduction_interval is: {new_food_reduction_interval}")
         # Set the generation of the offspring
         new_generation = max(parent1.generation, parent2.generation) + 1
         new_generation = min(new_generation, 8)  # Cap the generation to 8 as there are only 9 images (g0 to g8)
@@ -245,4 +251,4 @@ class Creature2(pygame.sprite.Sprite):
         elif multiplier > 0.2:
             multiplier = 0.2
         
-        return multiplier
+        return (multiplier + 1)
