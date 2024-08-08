@@ -15,9 +15,18 @@ class Tree2(pygame.sprite.Sprite):
     MAX_GROWTHS = 8
     unique_id_counter = 600  # Class variable to keep track of unique IDs
 
-    def __init__(self, image, initial_scale, parent, carrier, position, growth_rate, growth_interval):
+    def __init__(self, images, initial_scale, parent, carrier, position, growth_rate, growth_interval):
         super().__init__()
-        self.original_image = image
+        self.images = images
+        self.current_image_index = 0
+        self.image = self.images[self.current_image_index]
+        self.original_image = self.image.copy()
+        self.scale_factor = initial_scale
+        self.image = pygame.transform.scale(
+            self.image,
+            (int(self.image.get_width() * self.scale_factor),
+             int(self.image.get_height() * self.scale_factor))
+        )
         self.scale_factor = initial_scale
         self.image = pygame.transform.scale(
             self.original_image,
@@ -42,8 +51,35 @@ class Tree2(pygame.sprite.Sprite):
         # "self spawn" indicates that the new tree spawns from a seed that dropped from the tree itself
         self.next_self_spawn_time = pygame.time.get_ticks() + random.randint(30000, 55000)
 
+        self.position = pygame.math.Vector2(position)
+        self.growth_rate = growth_rate
+        self.growth_interval = growth_interval
+        self.last_growth_time = pygame.time.get_ticks()
+        self.growth_stage = 0
+        
+
 
     def grow(self):
+        current_time = pygame.time.get_ticks()
+        self.times_grown += 1
+        if self.times_grown > self.MAX_GROWTHS:
+            self.alive = False  
+        if current_time - self.last_growth_time >= self.growth_interval:
+            self.growth_stage += 1
+            if self.growth_stage < len(self.images):
+                self.current_image_index = self.growth_stage
+                self.image = self.images[self.current_image_index]
+                self.original_image = self.image.copy()
+                self.scale_factor += self.growth_rate
+                self.image = pygame.transform.scale(
+                    self.image,
+                    (int(self.image.get_width() * self.scale_factor),
+                     int(self.image.get_height() * self.scale_factor))
+                )
+                self.rect = self.image.get_rect(midbottom=self.position)
+            self.last_growth_time = current_time
+
+    def grow_old(self):
         self.times_grown += 1
 
         if self.times_grown >= self.MAX_GROWTHS:
@@ -70,12 +106,12 @@ class Tree2(pygame.sprite.Sprite):
                 self.position.y + random.randint(-50, 50)
             )
             new_tree = Tree2(
-                image=self.original_image,
-                initial_scale=0.1,
+                images=self.images,
+                initial_scale=0.5,
                 parent=self.unique_id,
                 carrier=0,
                 position=new_tree_position,
-                growth_rate=random.uniform(0.05, 0.12),
+                growth_rate=random.uniform(0.08, 0.15),
                 growth_interval=random.randint(4000, 8000)
             )
             trees.add(new_tree)

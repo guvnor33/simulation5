@@ -9,8 +9,8 @@ import datetime
 from tree2 import Tree2
 from creature2 import Creature2
 
-NUM_CREATURES = 70
-NUM_TREES = 50
+NUM_CREATURES = 80
+NUM_TREES = 40
 
 # Log file path
 log_file = 'simulation5.log'
@@ -46,31 +46,31 @@ tree_images = [
 ]
 
 # Add trees from nothing, these trees have no genetic inheritance from parents
-def add_initial_tree(trees, image, screen_width, screen_height):
+def add_initial_tree(trees, tree_images, screen_width, screen_height):
     new_tree = Tree2(
-        image=image[0],
-        initial_scale=0.1,
+        images=tree_images,
+        initial_scale=0.5,
         parent=0,
         carrier=0,
         position=(random.randint(0, screen_width), random.randint(0, screen_height)),
-        growth_rate=random.uniform(0.05, 0.12),
+        growth_rate=random.uniform(0.08, 0.15),
         growth_interval=random.randint(4000, 8000)
     )
     trees.add(new_tree)
 
 # Add tree spread by creature
-def add_tree_from_creature(trees, creature, image, screen_width, screen_height):
+def add_tree_from_creature(trees, creature, tree_images, screen_width, screen_height):
     if creature.trees_eaten_from:
         parent = creature.trees_eaten_from[0]
     else:
         parent = 000  # this would indicate that the creature has just digested "initial" food
     new_tree = Tree2(
-        image=image[0],
-        initial_scale=0.1,
+        images=tree_images,
+        initial_scale=0.5,
         parent=parent,
         carrier=creature.unique_id,
         position=(random.randint(0, screen_width), random.randint(0, screen_height)),
-        growth_rate=random.uniform(0.05, 0.12),
+        growth_rate=random.uniform(0.08, 0.15),
         growth_interval=random.randint(4000, 8000)
     )
     trees.add(new_tree)
