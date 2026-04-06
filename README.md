@@ -14,7 +14,7 @@ Creatures roam a 1280×720 world, searching for food, finding mates, and passing
 
 The simulation runs until the last creature starves, and logs every birth, death, and meal along the way.
 
-> **Tip:** Add a demo GIF to really make this pop! Run the simulation, capture ~10 seconds with a screen recorder, save as `demo.gif` in the repo root, and replace this line with `![Demo](demo.gif)`.
+![Demo](demo.gif)
 
 ---
 
